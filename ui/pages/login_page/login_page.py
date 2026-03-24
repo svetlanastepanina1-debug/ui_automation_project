@@ -29,4 +29,3 @@ class LoginPage(BaseElement):
     def login(self, email: str, password: str):
         self.set_email(email)
         self.set_password(password)
-        self.click_login()
