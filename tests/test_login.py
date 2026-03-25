@@ -17,7 +17,7 @@ def test_login_user1_success(driver, env_data):
     login_page.login(env_data["users"]["user_1"]["login"], env_data["users"]["user_1"]["password"])
 
     WebDriverWait(driver, 15).until(lambda d: d.current_url != LOGIN_URL)
-    assert "login" not in driver.current_url.lower(), "Ожидалось успешное перенаправление после user1"
+    assert driver.current_url is not None and "login" not in driver.current_url.lower(), "Ожидалось успешное перенаправление после user1"
 
 
 @pytest.mark.ui
