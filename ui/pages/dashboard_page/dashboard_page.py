@@ -134,9 +134,36 @@ class DashboardPage(BaseElement):
         from selenium.webdriver.support import expected_conditions as EC
 
         self.driver.get(self.URL)
+        self._dismiss_native_browser_alert_if_present()
+
         WebDriverWait(self.driver, 30).until(
             EC.visibility_of_element_located(DashboardLocators.FIRST_ALERT_ROW)
         )
+
+    def _dismiss_native_browser_alert_if_present(self):
+        """
+        Обработка нативного браузерного alert/confirm/prompt.
+        Если alert появилась (например, Chrome-предупреждение о пароле),
+        нажимаем OK (accept).
+        """
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.common.exceptions import TimeoutException
+
+        try:
+            # Ждём появления alert макс 3 секунды
+            WebDriverWait(self.driver, 3).until(EC.alert_is_present())
+            alert = self.driver.switch_to.alert
+            alert_text = alert.text
+            print(f"Alert detected: {alert_text}")
+            alert.accept()
+            return True
+        except TimeoutException:
+            # Alert не появился — это нормально
+            return False
+        except Exception as ex:
+            print(f"Error handling alert: {ex}")
+            return False
 
     def get_first_alert_row(self):
         return AlertRow(self.driver)
