@@ -3,11 +3,25 @@ import os
 import pytest
 import yaml
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "ui: mark test as a UI test")
+
+
+def _accept_unexpected_alert(driver, timeout=2):
+    try:
+        WebDriverWait(driver, timeout).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert_text = alert.text
+        alert.accept()
+        return alert_text
+    except TimeoutException:
+        return None
 
 
 @pytest.fixture(scope="session")
@@ -22,6 +36,25 @@ def driver():
     options = Options()
     options.add_argument("--start-maximized")
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-notifications")
+    options.add_argument("--disable-save-password-bubble")
+    options.add_argument("--disable-popup-blocking")
+    options.add_argument("--disable-features=PasswordManagerOnboarding,NotificationTriggers,MediaRouter")
+    options.add_experimental_option(
+        "prefs",
+        {
+            "credentials_enable_service": False,
+            "profile.password_manager_enabled": False,
+            "profile.password_manager_leak_detection": False,
+            "autofill.profile_enabled": False,
+            "autofill.credit_card_enabled": False,
+            "profile.default_content_setting_values.notifications": 2,
+            "profile.default_content_setting_values.geolocation": 2,
+            "profile.default_content_setting_values.media_stream_mic": 2,
+            "profile.default_content_setting_values.media_stream_camera": 2,
+        },
+    )
+    options.set_capability("unhandledPromptBehavior", "accept")
 
     driver = webdriver.Chrome(options=options)
     yield driver
@@ -30,13 +63,15 @@ def driver():
 
 @pytest.fixture(scope="function")
 def login(driver, env_data):
-    LOGIN_URL = "https://test.evist.nl/login/"
-    driver.get(LOGIN_URL)
+    login_url = env_data["urls"]["login"]
+    driver.get(login_url)
     from ui.pages.login_page.login_page import LoginPage
-    from selenium.webdriver.support.ui import WebDriverWait
 
     login_page = LoginPage(driver)
     login_page.login(env_data["users"]["user_1"]["login"], env_data["users"]["user_1"]["password"])
 
+    _accept_unexpected_alert(driver)
+
     WebDriverWait(driver, 20).until(lambda d: d.current_url and "login" not in d.current_url.lower())
+    _accept_unexpected_alert(driver)
     return driver

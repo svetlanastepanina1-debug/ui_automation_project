@@ -30,7 +30,7 @@ class DashboardLocators:
     LIVE_STREAM_TAB = (By.XPATH, "//div[contains(@class,'tab')]//span[text()='Live stream']")
 
     # Video controls
-    DOWNLOAD_BUTTON = (By.XPATH, "//button[contains(@class,'download-button')]")
+    DOWNLOAD_BUTTON = (By.XPATH, "//button[contains(translate(normalize-space(.), 'DOWNLOAD', 'download'), 'download') or .//*[local-name()='use' and contains(@*,'download')]]")
 
     # Weather info
     WEATHER_INFO_CONTAINER = (By.XPATH, "//div[contains(@class,'weather-info')]")
@@ -47,17 +47,17 @@ class DashboardLocators:
     TIMELINE_END_EVENT = (By.XPATH, "(//div[contains(@class,'grid') and contains(@class,'grid-cols-[6rem_24px_1fr]')]//div[@class='pl-1 text-text-primary break-words'])[2]")
 
     # Input fields
-    WHAT_HAPPENED_LABEL = (By.XPATH, "//div[@class='input-label' and text()='What happened']")
-    WHAT_HAPPENED_INPUT = (By.XPATH, "//div[@class='input-label' and text()='What happened']/following-sibling::div[@class='input-content']")
-    PREVENT_INPUT_LABEL = (By.XPATH, "//div[@class='input-label' and text()='How can we prevent this?']")
-    PREVENT_INPUT = (By.XPATH, "//div[@class='input-label' and text()='How can we prevent this?']/following-sibling::div[@class='input-content']")
-    STEPS_TAKEN_LABEL = (By.XPATH, "//div[@class='input-label' and text()='Steps taken after the incident']")
-    STEPS_TAKEN_INPUT = (By.XPATH, "//div[@class='input-label' and text()='Steps taken after the incident']/following-sibling::div[@class='text-xs text-text-primary font-normal leading-tight']")
+    WHAT_HAPPENED_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='What happened']")
+    WHAT_HAPPENED_INPUT = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='What happened']/following-sibling::div[contains(@class,'input-content')]")
+    PREVENT_INPUT_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='How can we prevent this?']")
+    PREVENT_INPUT = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='How can we prevent this?']/following-sibling::div[contains(@class,'input-content')]")
+    STEPS_TAKEN_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Steps taken after the incident']")
+    STEPS_TAKEN_INPUT = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Steps taken after the incident']/following-sibling::div[contains(@class,'text-xs')]")
 
     # Additional fields
-    HAPPENED_BEFORE_LABEL = (By.XPATH, "//div[@class='input-label' and text()='Happened before']")
-    HAPPENED_BEFORE_VALUE = (By.XPATH, "//div[@class='input-label' and text()='Happened before']/following-sibling::div[@class='input-content']")
-    HURT_OR_DAMAGED_LABEL = (By.XPATH, "//div[@class='input-label' and text()='Hurt or damaged']")
-    HURT_OR_DAMAGED_VALUE = (By.XPATH, "//div[@class='input-label' and text()='Hurt or damaged']/following-sibling::div[@class='input-content']")
-    SIMILAR_INCIDENTS_LABEL = (By.XPATH, "//div[@class='input-label' and text()='Similar incidents']")
-    SIMILAR_INCIDENTS_VALUE = (By.XPATH, "//div[@class='input-label' and text()='Similar incidents']/following-sibling::div[@class='input-content']")
+    HAPPENED_BEFORE_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Happened before']")
+    HAPPENED_BEFORE_VALUE = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Happened before']/following-sibling::div[contains(@class,'input-content')]")
+    HURT_OR_DAMAGED_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Hurt or damaged']")
+    HURT_OR_DAMAGED_VALUE = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Hurt or damaged']/following-sibling::div[contains(@class,'input-content')]")
+    SIMILAR_INCIDENTS_LABEL = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Similar incidents']")
+    SIMILAR_INCIDENTS_VALUE = (By.XPATH, "//div[contains(@class,'input-label') and normalize-space()='Similar incidents']/following-sibling::div[contains(@class,'input-content')]")

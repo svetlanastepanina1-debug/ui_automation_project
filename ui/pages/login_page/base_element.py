@@ -1,5 +1,6 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 
 class BaseElement:
@@ -27,4 +28,7 @@ class BaseElement:
         return self.find().text
 
     def is_displayed(self) -> bool:
-        return self.find().is_displayed()
+        try:
+            return self.find().is_displayed()
+        except (NoSuchElementException, StaleElementReferenceException):
+            return False

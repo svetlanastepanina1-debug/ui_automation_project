@@ -1,21 +1,18 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-from ui.pages.login_page.base_element import BaseElement
 from ui.pages.dashboard_page.locators import DashboardLocators
+from ui.pages.login_page.base_element import BaseElement
 
 
 class AlertRow(BaseElement):
-    """Элемент строки алерта в таблице"""
+    """Элемент строки алерта в таблице."""
 
     def __init__(self, driver, row_element=None):
         super().__init__(driver, DashboardLocators.FIRST_ALERT_ROW)
-        if row_element:
-            self.element = row_element
-        else:
-            self.element = self.find()
+        self.element = row_element if row_element is not None else self.find()
 
     def get_screenshot_img(self):
         return self.element.find_element(By.XPATH, ".//td[1]//img")
@@ -46,7 +43,7 @@ class AlertRow(BaseElement):
 
 
 class VideoPopup(BaseElement):
-    """Элемент модального окна с видео"""
+    """Элемент модального окна с видео."""
 
     def __init__(self, driver):
         super().__init__(driver, DashboardLocators.VIDEO_POPUP)
@@ -122,48 +119,44 @@ class VideoPopup(BaseElement):
 
 
 class DashboardPage(BaseElement):
-    """Page Object для страницы дашборда/оповещений"""
+    """Page Object для страницы дашборда/оповещений."""
 
     URL = "https://test.evist.nl/dashboard"
 
     def __init__(self, driver):
         super().__init__(driver, None)
 
-    def open(self):
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-
+    def open(self, accept_native_alert=True, alert_timeout=3):
         self.driver.get(self.URL)
-        self._dismiss_native_browser_alert_if_present()
+
+        if accept_native_alert:
+            self.handle_native_browser_popup(timeout=alert_timeout)
 
         WebDriverWait(self.driver, 30).until(
             EC.visibility_of_element_located(DashboardLocators.FIRST_ALERT_ROW)
         )
 
-    def _dismiss_native_browser_alert_if_present(self):
-        """
-        Обработка нативного браузерного alert/confirm/prompt.
-        Если alert появилась (например, Chrome-предупреждение о пароле),
-        нажимаем OK (accept).
-        """
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-        from selenium.common.exceptions import TimeoutException
+        if accept_native_alert:
+            self.handle_native_browser_popup(timeout=1)
 
+    def handle_native_browser_popup(self, action="accept", prompt_text=None, timeout=3):
+        """Обрабатывает нативный браузерный alert/confirm/prompt, если он появился."""
         try:
-            # Ждём появления alert макс 3 секунды
-            WebDriverWait(self.driver, 3).until(EC.alert_is_present())
+            WebDriverWait(self.driver, timeout).until(EC.alert_is_present())
             alert = self.driver.switch_to.alert
             alert_text = alert.text
-            print(f"Alert detected: {alert_text}")
-            alert.accept()
-            return True
+
+            if prompt_text is not None:
+                alert.send_keys(prompt_text)
+
+            if action == "dismiss":
+                alert.dismiss()
+            else:
+                alert.accept()
+
+            return alert_text
         except TimeoutException:
-            # Alert не появился — это нормально
-            return False
-        except Exception as ex:
-            print(f"Error handling alert: {ex}")
-            return False
+            return None
 
     def get_first_alert_row(self):
         return AlertRow(self.driver)
@@ -176,18 +169,19 @@ class DashboardPage(BaseElement):
         return VideoPopup(self.driver)
 
     def click_first_alert_row(self):
+        self.handle_native_browser_popup(timeout=1)
         first_row = WebDriverWait(self.driver, 20).until(
             EC.element_to_be_clickable(DashboardLocators.FIRST_ALERT_ROW)
         )
         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_row)
         first_row.click()
+        self.handle_native_browser_popup(timeout=1)
 
     def click_first_video_alert_row(self):
         try:
             self.click_first_alert_row()
             return True
-        except Exception as ex:
-            print(f"ERROR: click_first_video_alert_row failed: {type(ex).__name__}: {ex}")
+        except Exception:
             return False
 
     def wait_for_video_popup(self, timeout=30):
@@ -196,24 +190,21 @@ class DashboardPage(BaseElement):
         )
 
     def wait_for_video_popup_element(self, timeout=30):
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-
         return WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located(DashboardLocators.POPUP_VIDEO)
         )
 
     def is_video_popup_open(self):
         try:
-            return self.video_popup().is_displayed()
+            return self.get_video_popup().is_displayed()
         except Exception:
             return False
 
     def is_video_visible(self):
         try:
-            return self.popup_video().is_displayed()
+            return BaseElement(self.driver, DashboardLocators.POPUP_VIDEO).is_displayed()
         except Exception:
             return False
 
     def get_video_src(self):
-        return self.popup_video().find().get_attribute("src")
+        return BaseElement(self.driver, DashboardLocators.POPUP_VIDEO).find().get_attribute("src")
