@@ -75,3 +75,14 @@ def login(driver, env_data):
     WebDriverWait(driver, 20).until(lambda d: d.current_url and "login" not in d.current_url.lower())
     _accept_unexpected_alert(driver)
     return driver
+
+@pytest.fixture(scope="function")
+def investigations_page(login):
+    from ui.pages.dashboard_page.dashboard_page import DashboardPage
+    from ui.pages.investigations_page import InvestigationsPage
+
+    dashboard = DashboardPage(login)
+    dashboard.open()
+    investigations = InvestigationsPage(login)
+    investigations.click_investigations_menu()
+    return investigations

@@ -57,6 +57,84 @@ class InvestigationsPage(BaseElement):
         link.click()
         WebDriverWait(self.driver, 20).until(EC.url_contains("/investigations"))
 
+    def click_investigations_list_link(self):
+        link = WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(InvestigationsLocators.INVESTIGATIONS_LIST_LINK)
+        )
+        link.click()
+        WebDriverWait(self.driver, 30).until(
+            EC.visibility_of_element_located(InvestigationsLocators.INVESTIGATION_ROW)
+        )
+
+    def wait_for_initial_info_tab(self, timeout: int = 20) -> bool:
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(InvestigationsLocators.INITIAL_INFO_TAB)
+            )
+            return True
+        except TimeoutException:
+            return False
+
+    def click_add_investigation(self):
+        add_button = WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(InvestigationsLocators.ADD_INVESTIGATION_BUTTON)
+        )
+        add_button.click()
+        WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
+        )
+        WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
+        )
+
+    def fill_investigation_title(self, title: str):
+        WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
+        )
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT).send_keys(title)
+
+    def fill_investigation_id(self, investigation_id: str):
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_ID_INPUT).send_keys(investigation_id)
+
+    def select_ship_facility(self):
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SHIP_SELECT_BUTTON).click()
+        option = WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_SHIP_OPTION)
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView(true); arguments[0].click();", option)
+
+    def select_event_datetime(self):
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_BUTTON).click()
+        WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON)
+        )
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON).click()
+        WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON)
+        )
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON).click()
+
+    def save_new_investigation(self):
+        WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON)
+        )
+        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON).click()
+        WebDriverWait(self.driver, 20).until(
+            EC.invisibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
+        )
+
+    def wait_for_investigation_with_title(self, title: str, timeout: int = 30) -> bool:
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda d: any(
+                    title.lower() in row.element.text.lower()
+                    for row in self.get_investigation_rows()
+                )
+            )
+            return True
+        except TimeoutException:
+            return False
+
     def get_investigation_rows(self):
         rows = self.driver.find_elements(*InvestigationsLocators.INVESTIGATION_ROW)
         return [InvestigationRow(self.driver, row) for row in rows]
