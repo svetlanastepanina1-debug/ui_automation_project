@@ -5,33 +5,33 @@ from selenium.webdriver.support import expected_conditions as EC
 from ui.pages.dashboard_page.dashboard_page import DashboardPage
 
 
-# @pytest.mark.ui
-# def test_open_dashboard(login):
-#     """Тест открытия страницы дашборда"""
-#     dashboard = DashboardPage(login)
-#     dashboard.open()
+@pytest.mark.ui
+def test_open_dashboard(login):
+    """Тест открытия страницы дашборда"""
+    dashboard = DashboardPage(login)
+    dashboard.open()
 
-#     # Проверяем, что страница загрузилась и есть хотя бы одна строка алерта
-#     alert_rows = dashboard.get_alert_rows()
-#     assert len(alert_rows) > 0, "Ожидалось наличие алертов на дашборде"
+    # Проверяем, что страница загрузилась и есть хотя бы одна строка алерта
+    alert_rows = dashboard.get_alert_rows()
+    assert len(alert_rows) > 0, "Ожидалось наличие алертов на дашборде"
 
 
-# @pytest.mark.ui
-# def test_click_first_alert(login):
-#     """Тест клика по первой строке алерта"""
-#     dashboard = DashboardPage(login)
-#     dashboard.open()
+@pytest.mark.ui
+def test_click_first_alert(login):
+    """Тест клика по первой строке алерта"""
+    dashboard = DashboardPage(login)
+    dashboard.open()
 
-#     # Кликаем по первой строке
-#     result = dashboard.click_first_video_alert_row()
-#     assert result, "Не удалось кликнуть по первой строке алерта"
+    # Кликаем по первой строке
+    result = dashboard.click_first_video_alert_row()
+    assert result, "Не удалось кликнуть по первой строке алерта"
 
-#     # Проверяем, что popup появился
-#     popup = dashboard.get_video_popup()
-#     WebDriverWait(login, 10).until(
-#         EC.visibility_of_element_located(popup.locator)
-#     )
-#     assert popup.is_displayed(), "Popup с видео не появился"
+    # Проверяем, что popup появился
+    popup = dashboard.get_video_popup()
+    WebDriverWait(login, 10).until(
+        EC.visibility_of_element_located(popup.locator)
+    )
+    assert popup.is_displayed(), "Popup с видео не появился"
 
 
 @pytest.mark.ui
