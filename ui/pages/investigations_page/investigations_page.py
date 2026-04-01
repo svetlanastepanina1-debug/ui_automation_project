@@ -2,7 +2,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from ui.pages.investigations_locators import InvestigationsLocators
+from ui.pages.investigations_page.investigations_locators import InvestigationsLocators
 from ui.pages.login_page.base_element import BaseElement
 
 
