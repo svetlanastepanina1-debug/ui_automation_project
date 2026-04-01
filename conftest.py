@@ -26,6 +26,22 @@ def _accept_unexpected_alert(driver, timeout=2):
 
 @pytest.fixture(scope="session")
 def env_data():
+    if os.environ.get("BASE_URL"):
+        return {
+            "urls": {
+                "base": os.environ["BASE_URL"],
+                "login": os.environ["LOGIN_URL"],
+                "dashboard": os.environ["DASHBOARD_URL"],
+                "investigations": os.environ["INVESTIGATIONS_URL"],
+            },
+            "users": {
+                "user_1": {
+                    "login": os.environ["USER1_LOGIN"],
+                    "password": os.environ["USER1_PASSWORD"],
+                },
+            },
+        }
+
     env_path = os.path.join(os.path.dirname(__file__), "env.data.yml")
     with open(env_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -40,6 +56,12 @@ def driver():
     options.add_argument("--disable-save-password-bubble")
     options.add_argument("--disable-popup-blocking")
     options.add_argument("--disable-features=PasswordManagerOnboarding,NotificationTriggers,MediaRouter")
+
+    if os.environ.get("HEADLESS", "").lower() == "true":
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
     options.add_experimental_option(
         "prefs",
         {
