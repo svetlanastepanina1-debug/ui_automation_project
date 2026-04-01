@@ -79,7 +79,7 @@ def login(driver, env_data):
 @pytest.fixture(scope="function")
 def investigations_page(login):
     from ui.pages.dashboard_page.dashboard_page import DashboardPage
-    from ui.pages.investigations_page import InvestigationsPage
+    from ui.pages.investigations_page.investigations_page import InvestigationsPage
 
     dashboard = DashboardPage(login)
     dashboard.open()
