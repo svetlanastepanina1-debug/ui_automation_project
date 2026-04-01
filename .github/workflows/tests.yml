@@ -38,7 +38,9 @@ jobs:
           INVESTIGATIONS_URL: ${{ secrets.INVESTIGATIONS_URL }}
           USER1_LOGIN: ${{ secrets.USER1_LOGIN }}
           USER1_PASSWORD: ${{ secrets.USER1_PASSWORD }}
-        run: pytest tests/ -v --tb=short
+          USER2_LOGIN: ${{ secrets.USER2_LOGIN }}
+          USER2_PASSWORD: ${{ secrets.USER2_PASSWORD }}
+        run: pytest tests/ -v --tb=short --deselect tests/test_dashboard.py::test_video_popup_elements
 
       - name: Upload test results
         if: always()

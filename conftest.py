@@ -39,6 +39,10 @@ def env_data():
                     "login": os.environ["USER1_LOGIN"],
                     "password": os.environ["USER1_PASSWORD"],
                 },
+                "user_2": {
+                    "login": os.environ.get("USER2_LOGIN", ""),
+                    "password": os.environ.get("USER2_PASSWORD", ""),
+                },
             },
         }
 
