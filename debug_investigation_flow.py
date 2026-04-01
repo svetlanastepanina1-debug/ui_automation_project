@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from ui.pages.login_page.login_page import LoginPage
 from ui.pages.dashboard_page.dashboard_page import DashboardPage
 from ui.pages.investigations_page import InvestigationsPage
-from ui.pages.investigations_locators import InvestigationsLocators
+from ui.pages.investigations_page.investigations_locators import InvestigationsLocators
 
 with open('env.data.yml', 'r', encoding='utf-8') as f:
     env = yaml.safe_load(f)
