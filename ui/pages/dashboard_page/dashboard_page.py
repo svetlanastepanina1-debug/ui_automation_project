@@ -1,3 +1,4 @@
+import allure
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -127,17 +128,18 @@ class DashboardPage(BaseElement):
         super().__init__(driver, None)
 
     def open(self, accept_native_alert=True, alert_timeout=3):
-        self.driver.get(self.URL)
+        with allure.step("Открыть страницу Dashboard"):
+            self.driver.get(self.URL)
 
-        if accept_native_alert:
-            self.handle_native_browser_popup(timeout=alert_timeout)
+            if accept_native_alert:
+                self.handle_native_browser_popup(timeout=alert_timeout)
 
-        WebDriverWait(self.driver, 30).until(
-            EC.visibility_of_element_located(DashboardLocators.FIRST_ALERT_ROW)
-        )
+            WebDriverWait(self.driver, 30).until(
+                EC.visibility_of_element_located(DashboardLocators.FIRST_ALERT_ROW)
+            )
 
-        if accept_native_alert:
-            self.handle_native_browser_popup(timeout=1)
+            if accept_native_alert:
+                self.handle_native_browser_popup(timeout=1)
 
     def handle_native_browser_popup(self, action="accept", prompt_text=None, timeout=3):
         """Обрабатывает нативный браузерный alert/confirm/prompt, если он появился."""
@@ -169,13 +171,14 @@ class DashboardPage(BaseElement):
         return VideoPopup(self.driver)
 
     def click_first_alert_row(self):
-        self.handle_native_browser_popup(timeout=1)
-        first_row = WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(DashboardLocators.FIRST_ALERT_ROW)
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_row)
-        first_row.click()
-        self.handle_native_browser_popup(timeout=1)
+        with allure.step("Клик по первой строке алерта в таблице"):
+            self.handle_native_browser_popup(timeout=1)
+            first_row = WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(DashboardLocators.FIRST_ALERT_ROW)
+            )
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_row)
+            first_row.click()
+            self.handle_native_browser_popup(timeout=1)
 
     def click_first_video_alert_row(self):
         try:

@@ -1,5 +1,6 @@
 import os
 
+import allure
 import pytest
 import yaml
 from selenium import webdriver
@@ -90,25 +91,17 @@ def driver():
 @pytest.fixture(scope="function")
 def login(driver, env_data):
     login_url = env_data["urls"]["login"]
-    driver.get(login_url)
+    with allure.step("Открыть страницу входа"):
+        driver.get(login_url)
     from ui.pages.login_page.login_page import LoginPage
 
     login_page = LoginPage(driver)
-    login_page.login(env_data["users"]["user_1"]["login"], env_data["users"]["user_1"]["password"])
+    with allure.step("Выполнить вход под user_1"):
+        login_page.login(env_data["users"]["user_1"]["login"], env_data["users"]["user_1"]["password"])
 
     _accept_unexpected_alert(driver)
 
-    WebDriverWait(driver, 20).until(lambda d: d.current_url and "login" not in d.current_url.lower())
+    with allure.step("Дождаться успешного редиректа с login"):
+        WebDriverWait(driver, 20).until(lambda d: d.current_url and "login" not in d.current_url.lower())
     _accept_unexpected_alert(driver)
     return driver
-
-@pytest.fixture(scope="function")
-def investigations_page(login):
-    from ui.pages.dashboard_page.dashboard_page import DashboardPage
-    from ui.pages.investigations_page.investigations_page import InvestigationsPage
-
-    dashboard = DashboardPage(login)
-    dashboard.open()
-    investigations = InvestigationsPage(login)
-    investigations.click_investigations_menu()
-    return investigations

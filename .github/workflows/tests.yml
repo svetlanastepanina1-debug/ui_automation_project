@@ -2,14 +2,25 @@ name: UI Automation Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      has_report: ${{ steps.allure.outputs.has_report }}
 
     steps:
       - name: Checkout repository
@@ -42,7 +53,52 @@ jobs:
           USER2_PASSWORD: ${{ secrets.USER2_PASSWORD }}
         run: pytest tests/ -v --tb=short --deselect tests/test_dashboard.py::test_video_popup_elements
 
-      - name: Upload test results
+      - name: Set up Java (for Allure CLI)
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Allure CLI
+        if: always()
+        run: |
+          ALLURE_VERSION=2.30.0
+          curl -fsSL "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz" -o /tmp/allure.tgz
+          tar -xzf /tmp/allure.tgz -C /tmp
+          echo "/tmp/allure-${ALLURE_VERSION}/bin" >> "$GITHUB_PATH"
+
+      - name: Generate Allure report
+        id: allure
+        if: always()
+        run: |
+          echo "has_report=false" >> "$GITHUB_OUTPUT"
+          if [[ -d allure-results ]] && [[ -n "$(ls -A allure-results 2>/dev/null)" ]]; then
+            allure generate allure-results -o allure-report --clean
+            touch allure-report/.nojekyll
+            echo "has_report=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload Allure report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Allure report to GitHub Pages
+        if: >
+          always() &&
+          steps.allure.outputs.has_report == 'true' &&
+          (github.event_name == 'workflow_dispatch' ||
+           (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Upload pytest cache
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -50,4 +106,21 @@ jobs:
           path: |
             .pytest_cache/
             *.log
+          if-no-files-found: ignore
           retention-days: 7
+
+  deploy-allure:
+    needs: test
+    if: >
+      always() &&
+      needs.test.outputs.has_report == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Allure to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
