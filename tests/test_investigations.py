@@ -2,7 +2,7 @@ import pytest
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from ui.pages.investigations_page import InvestigationsPage
+from ui.pages.investigations_page.investigations_page import InvestigationsPage
 
 
 @pytest.mark.ui

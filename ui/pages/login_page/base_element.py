@@ -1,17 +1,27 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
 
 
 class BaseElement:
     """Обертка над WebElement для базовых действий."""
 
-    def __init__(self, driver: WebDriver, locator: tuple):
+    def __init__(self, driver: WebDriver, locator: tuple, timeout: int = 10):
         self.driver = driver
         self.locator = locator
+        self.timeout = timeout
 
     def find(self) -> WebElement:
-        return self.driver.find_element(*self.locator)
+        try:
+            element = WebDriverWait(self.driver, self.timeout).until(
+                EC.presence_of_element_located(self.locator)
+            )
+            return element
+        except TimeoutException:
+            # Fallback to regular find if wait fails
+            return self.driver.find_element(*self.locator)
 
     def click(self):
         element = self.find()

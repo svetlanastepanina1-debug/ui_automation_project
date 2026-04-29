@@ -91,6 +91,16 @@ def driver():
 def login(driver, env_data):
     login_url = env_data["urls"]["login"]
     driver.get(login_url)
+    
+    # Wait for the login page to fully load
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.common.by import By
+    
+    WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.XPATH, '//input[@name="loginEmail"]'))
+    )
+    
     from ui.pages.login_page.login_page import LoginPage
 
     login_page = LoginPage(driver)
