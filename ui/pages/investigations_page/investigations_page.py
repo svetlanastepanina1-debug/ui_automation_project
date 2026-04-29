@@ -1,3 +1,4 @@
+import allure
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,27 +45,30 @@ class InvestigationsPage(BaseElement):
         super().__init__(driver, None)
 
     def open(self):
-        self.driver.get(self.URL)
-        WebDriverWait(self.driver, 30).until(
-            EC.visibility_of_element_located(InvestigationsLocators.INVESTIGATION_ROW)
-        )
+        with allure.step("Открыть страницу Investigations по URL"):
+            self.driver.get(self.URL)
+            WebDriverWait(self.driver, 30).until(
+                EC.visibility_of_element_located(InvestigationsLocators.INVESTIGATION_ROW)
+            )
 
     def get_investigations_menu_link(self):
         return BaseElement(self.driver, InvestigationsLocators.INVESTIGATIONS_MENU_LINK)
 
     def click_investigations_menu(self):
-        link = self.get_investigations_menu_link()
-        link.click()
-        WebDriverWait(self.driver, 20).until(EC.url_contains("/investigations"))
+        with allure.step("Перейти в Investigations через пункт меню"):
+            link = self.get_investigations_menu_link()
+            link.click()
+            WebDriverWait(self.driver, 20).until(EC.url_contains("/investigations"))
 
     def click_investigations_list_link(self):
-        link = WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(InvestigationsLocators.INVESTIGATIONS_LIST_LINK)
-        )
-        link.click()
-        WebDriverWait(self.driver, 30).until(
-            EC.visibility_of_element_located(InvestigationsLocators.INVESTIGATION_ROW)
-        )
+        with allure.step("Вернуться к списку Investigations"):
+            link = WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(InvestigationsLocators.INVESTIGATIONS_LIST_LINK)
+            )
+            link.click()
+            WebDriverWait(self.driver, 30).until(
+                EC.visibility_of_element_located(InvestigationsLocators.INVESTIGATION_ROW)
+            )
 
     def wait_for_initial_info_tab(self, timeout: int = 20) -> bool:
         try:
@@ -76,52 +80,58 @@ class InvestigationsPage(BaseElement):
             return False
 
     def click_add_investigation(self):
-        add_button = WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(InvestigationsLocators.ADD_INVESTIGATION_BUTTON)
-        )
-        add_button.click()
-        WebDriverWait(self.driver, 20).until(
-            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
-        )
-        WebDriverWait(self.driver, 20).until(
-            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
-        )
+        with allure.step("Открыть форму создания расследования"):
+            add_button = WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(InvestigationsLocators.ADD_INVESTIGATION_BUTTON)
+            )
+            add_button.click()
+            WebDriverWait(self.driver, 20).until(
+                EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
+            )
+            WebDriverWait(self.driver, 20).until(
+                EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
+            )
 
     def fill_investigation_title(self, title: str):
-        WebDriverWait(self.driver, 20).until(
-            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
-        )
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT).send_keys(title)
+        with allure.step("Заполнить название расследования"):
+            WebDriverWait(self.driver, 20).until(
+                EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT)
+            )
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_TITLE_INPUT).send_keys(title)
 
     def fill_investigation_id(self, investigation_id: str):
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_ID_INPUT).send_keys(investigation_id)
+        with allure.step("Заполнить ID расследования"):
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_ID_INPUT).send_keys(investigation_id)
 
     def select_ship_facility(self):
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SHIP_SELECT_BUTTON).click()
-        option = WebDriverWait(self.driver, 20).until(
-            EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_SHIP_OPTION)
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView(true); arguments[0].click();", option)
+        with allure.step("Выбрать судно / объект"):
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SHIP_SELECT_BUTTON).click()
+            option = WebDriverWait(self.driver, 20).until(
+                EC.visibility_of_element_located(InvestigationsLocators.CREATE_DIALOG_SHIP_OPTION)
+            )
+            self.driver.execute_script("arguments[0].scrollIntoView(true); arguments[0].click();", option)
 
     def select_event_datetime(self):
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_BUTTON).click()
-        WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON)
-        )
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON).click()
-        WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON)
-        )
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON).click()
+        with allure.step("Выбрать дату и время события"):
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_BUTTON).click()
+            WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON)
+            )
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_TODAY_BUTTON).click()
+            WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON)
+            )
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_DATETIME_OK_BUTTON).click()
 
     def save_new_investigation(self):
-        WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON)
-        )
-        BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON).click()
-        WebDriverWait(self.driver, 20).until(
-            EC.invisibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
-        )
+        with allure.step("Сохранить новое расследование"):
+            WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable(InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON)
+            )
+            BaseElement(self.driver, InvestigationsLocators.CREATE_DIALOG_SAVE_BUTTON).click()
+            WebDriverWait(self.driver, 20).until(
+                EC.invisibility_of_element_located(InvestigationsLocators.CREATE_DIALOG)
+            )
 
     def wait_for_investigation_with_title(self, title: str, timeout: int = 30) -> bool:
         try:
