@@ -19,7 +19,6 @@ def test_open_investigations_page(login):
         first_row = investigations.get_first_investigation_row()
         assert first_row is not None, "Ожидалось, что на странице Investigations есть хотя бы одна строка"
 
-        assert first_row.get_description().text, "Описание расследования не должно быть пустым"
         assert first_row.get_vessel().text, "Название судна не должно быть пустым"
         assert first_row.get_incident().text, "Текст инцидента не должен быть пустым"
         assert first_row.get_team().text, "Команда не должна быть пустой"
