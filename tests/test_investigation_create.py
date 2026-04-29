@@ -3,7 +3,7 @@ import string
 
 import pytest
 
-from ui.pages.investigation_page.investigations_page import InvestigationsPage
+from ui.pages.investigations_page.investigations_page import InvestigationsPage
 
 
 def _random_eng_text(length: int = 12) -> str:
