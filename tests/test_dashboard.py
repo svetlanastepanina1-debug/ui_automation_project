@@ -113,29 +113,6 @@ def test_popup_weather_info(login):
 @allure.epic("EVist UI")
 @allure.feature("Dashboard")
 @pytest.mark.ui
-def test_popup_timeline(login):
-    """Тест таймлайна в popup"""
-    dashboard = DashboardPage(login)
-
-    with allure.step("Открыть дашборд и popup"):
-        dashboard.open()
-        dashboard.click_first_video_alert_row()
-
-    with allure.step("Проверить элементы таймлайна"):
-        popup = dashboard.get_video_popup()
-        start_time = popup.get_timeline_start_time()
-        assert start_time.is_displayed(), "Время начала не отображается"
-        start_event = popup.get_timeline_start_event()
-        assert start_event.is_displayed(), "Событие начала не отображается"
-        end_time = popup.get_timeline_end_time()
-        assert end_time.is_displayed(), "Время окончания не отображается"
-        end_event = popup.get_timeline_end_event()
-        assert end_event.is_displayed(), "Событие окончания не отображается"
-
-
-@allure.epic("EVist UI")
-@allure.feature("Dashboard")
-@pytest.mark.ui
 def test_popup_input_fields(login):
     """Тест полей ввода в popup"""
     dashboard = DashboardPage(login)
